@@ -18,32 +18,40 @@ if %w{rhel debian}.include?(node['platform_family'])
     package 'build-essential'
   end
 
+  execute 'extract_autoconf' do
+    command 'tar xzvf autoconf-2.61.tar.gz'
+    cwd     '/usr/local/src'
+    notifies :run, 'execute[configure_autoconf]', :immediately
+    action :nothing
+  end
+
   execute 'configure_autoconf' do
     command './configure'
-    cwd     '/usr/local/src/autoconf'
+    cwd     '/usr/local/src/autoconf-2.61'
     notifies :run, 'execute[make_autoconf]', :immediately
     action :nothing
   end
 
   execute 'make_autoconf' do
     command 'make'
-    cwd     '/usr/local/src/autoconf'
+    cwd     '/usr/local/src/autoconf-2.61'
     notifies :run, 'execute[install_autoconf]', :immediately
     action :nothing
   end
 
   execute 'install_autoconf' do
     command 'make install'
-    cwd     '/usr/local/src/autoconf'
+    cwd     '/usr/local/src/autoconf-2.61'
     action :nothing
   end
 
-  git 'autoconf' do
-    destination '/usr/local/src/autoconf'
-    repository 'https://github.com/Distrotech/autoconf.git'
-    revision 'AUTOCONF-2.61'
-    notifies :run, 'execute[configure_autoconf]', :immediately
-    action :sync
+  remote_file '/usr/local/src/autoconf-2.61.tar.gz' do
+    source 'http://ftp.gnu.org/gnu/autoconf/autoconf-2.61.tar.gz'
+    owner 'root'
+    group 'root'
+    mode '0755'
+    notifies :run, 'execute[extract_autoconf]', :immediately
+    action :create_if_missing
   end
 
   ### Read attributes and set vars ###
