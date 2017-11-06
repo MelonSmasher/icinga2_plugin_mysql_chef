@@ -8,20 +8,42 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   ### Install any packages that we need ###
   package 'git'
+  package 'autoconf' do
+    action :remove
+  end
   if node['platform_family'] == 'rhel'
     package %w(gcc gcc-c++ make openssl-devel)
-    package 'autoconf' do
-      version '2.61'
-      allow_downgrade true
-      action :install
-    end
   end
   if node['platform_family'] == 'debian'
     package 'build-essential'
-    package 'autoconf' do
-      version '2.61'
-      action :install
-    end
+  end
+
+  execute 'configure_autoconf' do
+    command './configure'
+    cwd     '/usr/local/src/autoconf'
+    notifies :run, 'execute[make_autoconf]', :immediately
+    action :nothing
+  end
+
+  execute 'make_autoconf' do
+    command 'make'
+    cwd     '/usr/local/src/autoconf'
+    notifies :run, 'execute[install_autoconf]', :immediately
+    action :nothing
+  end
+
+  execute 'install_autoconf' do
+    command 'make install'
+    cwd     '/usr/local/src/autoconf'
+    action :nothing
+  end
+
+  git 'autoconf' do
+    destination '/usr/local/src/autoconf'
+    repository 'https://github.com/Distrotech/autoconf.git'
+    revision 'AUTOCONF-2.61'
+    notifies :run, 'execute[configure_autoconf]', :immediately
+    action :sync
   end
 
   ### Read attributes and set vars ###
