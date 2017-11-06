@@ -9,7 +9,7 @@ if %w{rhel debian}.include?(node['platform_family'])
   ### Install any packages that we need ###
   package 'git'
   package 'autoconf' do
-    version 2.61
+    version '2.61'
     allow_downgrade true
     action :install
   end
