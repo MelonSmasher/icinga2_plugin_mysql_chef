@@ -8,16 +8,20 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   ### Install any packages that we need ###
   package 'git'
-  package 'autoconf' do
-    version '2.61'
-    allow_downgrade true
-    action :install
-  end
   if node['platform_family'] == 'rhel'
     package %w(gcc gcc-c++ make openssl-devel)
+    package 'autoconf' do
+      version '2.61'
+      allow_downgrade true
+      action :install
+    end
   end
   if node['platform_family'] == 'debian'
     package 'build-essential'
+    package 'autoconf' do
+      version '2.61'
+      action :install
+    end
   end
 
   ### Read attributes and set vars ###
