@@ -7,16 +7,20 @@
 if %w{rhel debian}.include?(node['platform_family'])
 
   ### Install any packages that we need ###
-  package 'git'
+
   package 'autoconf' do
     action :remove
   end
+
   if node['platform_family'] == 'rhel'
     package %w(gcc gcc-c++ make openssl-devel)
   end
+
   if node['platform_family'] == 'debian'
     package 'build-essential'
   end
+
+  package %w(git automake)
 
   execute 'extract_autoconf' do
     command 'tar xzvf autoconf-2.61.tar.gz'
