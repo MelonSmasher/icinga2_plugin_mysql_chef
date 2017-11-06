@@ -10,7 +10,7 @@ git_tag = node['icinga2_plugin_mysql']['git']['tag']
 
 nagios_user = node['icinga2_plugin_mysql']['nagios']['user']
 nagios_group = node['icinga2_plugin_mysql']['nagios']['group']
-nagios_plugin_link = ['icinga2_plugin_mysql']['nagios']['nagios_plugin_link']
+nagios_plugin_link = node['icinga2_plugin_mysql']['nagios']['nagios_plugin_link']
 
 env_perl_path = node['icinga2_plugin_mysql']['env']['perl_path']
 
