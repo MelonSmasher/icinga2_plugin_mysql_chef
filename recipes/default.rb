@@ -8,9 +8,7 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   ### Install any packages that we need ###
 
-  package 'autoconf' do
-    action :remove
-  end
+  package 'git'
 
   if node['platform_family'] == 'rhel'
     package %w(gcc gcc-c++ make openssl-devel)
@@ -20,32 +18,34 @@ if %w{rhel debian}.include?(node['platform_family'])
     package 'build-essential'
   end
 
-  package %w(git automake)
+  package %w(autoconf automake) do
+    action :remove
+  end
 
   execute 'extract_autoconf' do
     command 'tar xzvf autoconf-2.61.tar.gz'
-    cwd     '/usr/local/src'
+    cwd '/usr/local/src'
     notifies :run, 'execute[configure_autoconf]', :immediately
     action :nothing
   end
 
   execute 'configure_autoconf' do
     command './configure'
-    cwd     '/usr/local/src/autoconf-2.61'
+    cwd '/usr/local/src/autoconf-2.61'
     notifies :run, 'execute[make_autoconf]', :immediately
     action :nothing
   end
 
   execute 'make_autoconf' do
     command 'make'
-    cwd     '/usr/local/src/autoconf-2.61'
+    cwd '/usr/local/src/autoconf-2.61'
     notifies :run, 'execute[install_autoconf]', :immediately
     action :nothing
   end
 
   execute 'install_autoconf' do
     command 'make install'
-    cwd     '/usr/local/src/autoconf-2.61'
+    cwd '/usr/local/src/autoconf-2.61'
     action :nothing
   end
 
@@ -55,6 +55,42 @@ if %w{rhel debian}.include?(node['platform_family'])
     group 'root'
     mode '0755'
     notifies :run, 'execute[extract_autoconf]', :immediately
+    action :create_if_missing
+  end
+
+  execute 'extract_automake' do
+    command 'tar xzvf automake-1.15.tar.gz'
+    cwd '/usr/local/src'
+    notifies :run, 'execute[configure_automake]', :immediately
+    action :nothing
+  end
+
+  execute 'configure_automake' do
+    command './configure'
+    cwd '/usr/local/src/automake-1.15'
+    notifies :run, 'execute[make_automake]', :immediately
+    action :nothing
+  end
+
+  execute 'make_automake' do
+    command 'make'
+    cwd '/usr/local/src/automake-1.15'
+    notifies :run, 'execute[install_automake]', :immediately
+    action :nothing
+  end
+
+  execute 'install_automake' do
+    command 'make install'
+    cwd '/usr/local/src/automake-1.15'
+    action :nothing
+  end
+
+  remote_file '/usr/local/src/automake-1.15.tar.gz' do
+    source 'http://ftp.gnu.org/gnu/automake/automake-1.15.tar.gz'
+    owner 'root'
+    group 'root'
+    mode '0755'
+    notifies :run, 'execute[extract_automake]', :immediately
     action :create_if_missing
   end
 
