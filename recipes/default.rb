@@ -163,7 +163,7 @@ if %w{rhel debian}.include?(node['platform_family'])
   # link the plugin
   link 'link_plugin' do
     link_type :symbolic
-    target_file File.join(git_repo_path, 'plugins-scripts')
+    target_file File.join(git_repo_path, 'plugins-scripts', 'check_mysql_health')
     to nagios_plugin_link
     action :nothing
   end
