@@ -170,12 +170,12 @@ if %w{rhel debian}.include?(node['platform_family'])
   end
 
   # copy the plugin
-  file 'copy_plugin' do
+  remote_file 'copy_plugin' do
+    path nagios_plugin_target
+    source "file://#{nagios_plugin_source}"
     owner 'root'
     group 'root'
-    path nagios_plugin_target
     mode 0755
-    content ::File.open(nagios_plugin_source).read
     action :nothing
   end
 
