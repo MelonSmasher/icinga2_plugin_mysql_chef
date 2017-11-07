@@ -21,10 +21,10 @@ if %w{rhel debian}.include?(node['platform_family'])
     package 'build-essential'
   end
 
-  # we can't have these conflict
-  package %w(autoconf automake) do
-    action :remove
-  end
+  ## we can't have these conflict
+  #package %w(autoconf automake) do
+  #  action :remove
+  #end
 
   # extracts the autoconf tar - only runs when triggered by the remote_file download directive
   execute 'extract_autoconf' do
@@ -51,11 +51,11 @@ if %w{rhel debian}.include?(node['platform_family'])
   end
 
   # installs the autoconf bins - only runs when triggered by the execute make directive
-  execute 'install_autoconf' do
-    command 'make install'
-    cwd '/usr/local/src/autoconf-2.61'
-    action :nothing
-  end
+  #execute 'install_autoconf' do
+  #  command 'make install'
+  #  cwd '/usr/local/src/autoconf-2.61'
+  #  action :nothing
+  #end
 
   # downloads the autoconf source
   remote_file '/usr/local/src/autoconf-2.61.tar.gz' do
@@ -91,12 +91,12 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
-  # installs the automake bins - only runs when triggered by the execute make directive
-  execute 'install_automake' do
-    command 'make install'
-    cwd '/usr/local/src/automake-1.10'
-    action :nothing
-  end
+  ## installs the automake bins - only runs when triggered by the execute make directive
+  #execute 'install_automake' do
+  #  command 'make install'
+  #  cwd '/usr/local/src/automake-1.10'
+  #  action :nothing
+  #end
 
   # downloads the automake source
   remote_file '/usr/local/src/automake-1.10.tar.gz' do
@@ -118,10 +118,13 @@ if %w{rhel debian}.include?(node['platform_family'])
   nagios_plugin_target = File.join(node['icinga2_plugin_mysql']['nagios']['nagios_plugin_dir'] , 'check_mysql_health')
   nagios_plugin_source = File.join(git_repo_path, 'plugins-scripts', 'check_mysql_health')
 
+  autoconf_bin = '/usr/local/src/autoconf-2.61/bin/autoconf'
+  automake_bin = '/usr/local/src/automake-1.10/automake'
+
   ### Commands - not run until notified ###
   # run autoconf
   execute 'autoconf' do
-    command "autoconf"
+    command autoconf_bin
     cwd git_repo_path
     notifies :run, 'execute[automake]', :immediately
     action :nothing
@@ -129,7 +132,7 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   # run automake
   execute 'automake' do
-    command "automake -a"
+    command "#{automake_bin} -a"
     cwd git_repo_path
     notifies :run, 'execute[configure]', :immediately
     action :nothing
