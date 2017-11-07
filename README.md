@@ -4,9 +4,9 @@ Installs the Nagios MySQL Health Check plugin for Nagios/icinga2 using [lausser/
 
 ## Usage
 
-### sage_cert::default
+### icinga2_plugin_mysql::default
 
-Just include `sage_cert` in your node's `run_list`:
+Just include `icinga2_plugin_mysql` in your node's `run_list`:
 
 ```json
 {
