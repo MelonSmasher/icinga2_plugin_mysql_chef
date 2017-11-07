@@ -8,23 +8,15 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   ### Install any packages / tools that we need ###
 
-  # install git
-  package 'git'
-
-  # install build tools for rhel
+  # install tools for rhel
   if node['platform_family'] == 'rhel'
-    package %w(gcc gcc-c++ make openssl-devel)
+    package %w(git gcc gcc-c++ make openssl-devel)
   end
 
-  # install build tools for deb
+  # install tools for deb
   if node['platform_family'] == 'debian'
-    package 'build-essential'
+    package %w(git build-essential)
   end
-
-  ## we can't have these conflict
-  #package %w(autoconf automake) do
-  #  action :remove
-  #end
 
   # extracts the autoconf tar - only runs when triggered by the remote_file download directive
   execute 'extract_autoconf' do
@@ -46,16 +38,8 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_autoconf' do
     command 'make'
     cwd '/usr/local/src/autoconf-2.61'
-    #notifies :run, 'execute[install_autoconf]', :immediately
     action :nothing
   end
-
-  # installs the autoconf bins - only runs when triggered by the execute make directive
-  #execute 'install_autoconf' do
-  #  command 'make install'
-  #  cwd '/usr/local/src/autoconf-2.61'
-  #  action :nothing
-  #end
 
   # downloads the autoconf source
   remote_file '/usr/local/src/autoconf-2.61.tar.gz' do
@@ -87,16 +71,8 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_automake' do
     command 'make'
     cwd '/usr/local/src/automake-1.10'
-    #notifies :run, 'execute[install_automake]', :immediately
     action :nothing
   end
-
-  ## installs the automake bins - only runs when triggered by the execute make directive
-  #execute 'install_automake' do
-  #  command 'make install'
-  #  cwd '/usr/local/src/automake-1.10'
-  #  action :nothing
-  #end
 
   # downloads the automake source
   remote_file '/usr/local/src/automake-1.10.tar.gz' do
@@ -115,7 +91,7 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   nagios_user = node['icinga2_plugin_mysql']['nagios']['user']
   nagios_group = node['icinga2_plugin_mysql']['nagios']['group']
-  nagios_plugin_target = File.join(node['icinga2_plugin_mysql']['nagios']['nagios_plugin_dir'] , 'check_mysql_health')
+  nagios_plugin_target = File.join(node['icinga2_plugin_mysql']['nagios']['nagios_plugin_dir'], 'check_mysql_health')
   nagios_plugin_source = File.join(git_repo_path, 'plugins-scripts', 'check_mysql_health')
 
   autoconf_bin = '/usr/local/src/autoconf-2.61/bin/autoconf'
@@ -168,17 +144,18 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_install' do
     command 'make install'
     cwd git_repo_path
-    notifies :create, 'remote_file[copy_plugin]', :immediately
+    notifies :create, 'link[link_plugin]', :immediately
     action :nothing
   end
 
-  # copy the plugin
-  remote_file 'copy_plugin' do
-    path nagios_plugin_target
-    source "file://#{nagios_plugin_source}"
+  # link the plugin
+  link 'link_plugin' do
+    link_type :symbolic
+    mode 0755
     owner 'root'
     group 'root'
-    mode 0755
+    target_file nagios_plugin_target
+    to nagios_plugin_source
     action :nothing
   end
 
