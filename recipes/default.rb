@@ -176,7 +176,7 @@ if %w{rhel debian}.include?(node['platform_family'])
     path nagios_plugin_target
     mode 0755
     content ::File.open(nagios_plugin_source).read
-    action :create
+    action :nothing
   end
 
   ### Clone the repository ###
