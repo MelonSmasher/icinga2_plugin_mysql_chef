@@ -114,16 +114,23 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'autoconf' do
     command "autoconf"
     cwd git_repo_path
+    notifies :run, 'execute[automake]', :immediately
+    action :nothing
+  end
+
+  # run automake
+  execute 'automake' do
+    command "automake -a"
+    cwd git_repo_path
     notifies :run, 'execute[configure]', :immediately
     action :nothing
   end
+
   # run configure
   execute 'configure' do
     command "./configure --prefix=#{git_repo_path} " \
             "--with-nagios-user=#{nagios_user} " \
-            "--with-nagios-group=#{nagios_group} " \
-            "--with-perl=#{env_perl_path} " \
-            "--with-statefiles-dir=#{git_repo_path}"
+            "--with-nagios-group=#{nagios_group} "
     cwd git_repo_path
     notifies :run, 'execute[make]', :immediately
     action :nothing
