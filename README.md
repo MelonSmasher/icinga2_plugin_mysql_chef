@@ -129,12 +129,12 @@ The git repository where this plugin's source should be pulled from
 
 Default Value: 
 
-- `https://github.com/MelonSmasher/check_mysql_health.git`
+- `https://github.com/lausser/check_mysql_health.git`
 
 Ruby usage:
 
 ```ruby
-node['icinga2_plugin_mysql']['git']['repo_src_url'] = 'https://github.com/MelonSmasher/check_mysql_health.git'
+node['icinga2_plugin_mysql']['git']['repo_src_url'] = 'https://github.com/lausser/check_mysql_health.git'
 ```
 
 JSON usage:
@@ -143,7 +143,7 @@ JSON usage:
 {
   "icinga2_plugin_mysql": {
     "git": {
-      "repo_src_url": "https://github.com/MelonSmasher/check_mysql_health.git"
+      "repo_src_url": "https://github.com/lausser/check_mysql_health.git"
     }
   }
 }
