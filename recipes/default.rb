@@ -10,12 +10,12 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   # install tools for rhel
   if node['platform_family'] == 'rhel'
-    package %w(git gcc gcc-c++ make openssl-devel)
+    package %w(git perl gcc gcc-c++ make openssl-devel)
   end
 
   # install tools for deb
   if node['platform_family'] == 'debian'
-    package %w(git build-essential)
+    package %w(git perl build-essential)
   end
 
   # extracts the autoconf tar - only runs when triggered by the remote_file download directive
