@@ -19,32 +19,6 @@ Just include `sage_cert` in your node's `run_list`:
 
 ## Attributes
 
-### Perl Path:
-
-Location to Perl binary
-
-Default Value: 
-
-- `/usr/bin/perl`
-
-Ruby usage:
-
-```ruby
-node['icinga2_plugin_mysql']['env']['perl_path'] = '/usr/bin/perl'
-```
-
-JSON usage:
-
-```json
-{
-  "icinga2_plugin_mysql": {
-    "env": {
-      "perl_path": "/usr/bin/perl"
-    }
-  }
-}
-```
-
 ### Nagios User:
 
 The user that Nagios runs under
