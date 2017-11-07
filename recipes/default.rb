@@ -165,7 +165,7 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_install' do
     command 'make install'
     cwd git_repo_path
-    notifies :create, 'file[copy_plugin]', :immediately
+    notifies :create, 'remote_file[copy_plugin]', :immediately
     action :nothing
   end
 
