@@ -46,7 +46,7 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_autoconf' do
     command 'make'
     cwd '/usr/local/src/autoconf-2.61'
-    notifies :run, 'execute[install_autoconf]', :immediately
+    #notifies :run, 'execute[install_autoconf]', :immediately
     action :nothing
   end
 
@@ -87,7 +87,7 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_automake' do
     command 'make'
     cwd '/usr/local/src/automake-1.10'
-    notifies :run, 'execute[install_automake]', :immediately
+    #notifies :run, 'execute[install_automake]', :immediately
     action :nothing
   end
 
