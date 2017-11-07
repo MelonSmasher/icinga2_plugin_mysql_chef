@@ -6,22 +6,27 @@
 # Check what OS family we are on
 if %w{rhel debian}.include?(node['platform_family'])
 
-  ### Install any packages that we need ###
+  ### Install any packages / tools that we need ###
 
+  # install git
   package 'git'
 
+  # install build tools for rhel
   if node['platform_family'] == 'rhel'
     package %w(gcc gcc-c++ make openssl-devel)
   end
 
+  # install build tools for deb
   if node['platform_family'] == 'debian'
     package 'build-essential'
   end
 
+  # we can't have these conflict
   package %w(autoconf automake) do
     action :remove
   end
 
+  # extracts the autoconf tar - only runs when triggered by the remote_file download directive
   execute 'extract_autoconf' do
     command 'tar xzvf autoconf-2.61.tar.gz'
     cwd '/usr/local/src'
@@ -29,6 +34,7 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
+  # runs the configure script for autoconf - only runs when triggered by the execute tar directive
   execute 'configure_autoconf' do
     command './configure'
     cwd '/usr/local/src/autoconf-2.61'
@@ -36,6 +42,7 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
+  # makes the autoconf bin - only runs when triggered by the execute configure directive
   execute 'make_autoconf' do
     command 'make'
     cwd '/usr/local/src/autoconf-2.61'
@@ -43,12 +50,14 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
+  # installs the autoconf bins - only runs when triggered by the execute make directive
   execute 'install_autoconf' do
     command 'make install'
     cwd '/usr/local/src/autoconf-2.61'
     action :nothing
   end
 
+  # downloads the autoconf source
   remote_file '/usr/local/src/autoconf-2.61.tar.gz' do
     source 'http://ftp.gnu.org/gnu/autoconf/autoconf-2.61.tar.gz'
     owner 'root'
@@ -58,6 +67,7 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :create_if_missing
   end
 
+  # extracts the automake tar - only runs when triggered by the remote_file download directive
   execute 'extract_automake' do
     command 'tar xzvf automake-1.10.tar.gz'
     cwd '/usr/local/src'
@@ -65,6 +75,7 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
+  # runs the configure script for automake - only runs when triggered by the execute tar directive
   execute 'configure_automake' do
     command './configure'
     cwd '/usr/local/src/automake-1.10'
@@ -72,6 +83,7 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
+  # makes the automake bin - only runs when triggered by the execute configure directive
   execute 'make_automake' do
     command 'make'
     cwd '/usr/local/src/automake-1.10'
@@ -79,12 +91,14 @@ if %w{rhel debian}.include?(node['platform_family'])
     action :nothing
   end
 
+  # installs the automake bins - only runs when triggered by the execute make directive
   execute 'install_automake' do
     command 'make install'
     cwd '/usr/local/src/automake-1.10'
     action :nothing
   end
 
+  # downloads the automake source
   remote_file '/usr/local/src/automake-1.10.tar.gz' do
     source 'http://ftp.gnu.org/gnu/automake/automake-1.10.tar.gz'
     owner 'root'
@@ -101,13 +115,8 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   nagios_user = node['icinga2_plugin_mysql']['nagios']['user']
   nagios_group = node['icinga2_plugin_mysql']['nagios']['group']
-  nagios_plugin_link = node['icinga2_plugin_mysql']['nagios']['nagios_plugin_link']
-
-  env_perl_path = node['icinga2_plugin_mysql']['env']['perl_path']
-
-  #mysql_host = node['icinga2_plugin_mysql']['mysql']['host']
-  #mysql_user = node['icinga2_plugin_mysql']['mysql']['user']
-  #mysql_password = node['icinga2_plugin_mysql']['mysql']['password']
+  nagios_plugin_target = File.join(node['icinga2_plugin_mysql']['nagios']['nagios_plugin_dir'] , 'check_mysql_health')
+  nagios_plugin_source = File.join(git_repo_path, 'plugins-scripts', 'check_mysql_health')
 
   ### Commands - not run until notified ###
   # run autoconf
@@ -156,16 +165,18 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_install' do
     command 'make install'
     cwd git_repo_path
-    notifies :create, 'link[link_plugin]', :immediately
+    notifies :create, 'file[copy_plugin]', :immediately
     action :nothing
   end
 
-  # link the plugin
-  link 'link_plugin' do
-    link_type :symbolic
-    target_file File.join(git_repo_path, 'plugins-scripts', 'check_mysql_health')
-    to nagios_plugin_link
-    action :nothing
+  # copy the plugin
+  file 'copy_plugin' do
+    owner 'root'
+    group 'root'
+    path nagios_plugin_target
+    mode 0755
+    content ::File.open(nagios_plugin_source).read
+    action :create
   end
 
   ### Clone the repository ###

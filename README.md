@@ -1,6 +1,6 @@
 # icinga2_plugin_mysql
 
-Installs the Nagios MySQL Health Check plugin for icinga2.
+Installs the Nagios MySQL Health Check plugin for Nagios/icinga2 using [lausser/check_mysql_health](https://github.com/lausser/check_mysql_health).
 
 ## Usage
 
@@ -97,18 +97,18 @@ JSON usage:
 }
 ```
 
-### Nagios Plugin Link Path:
+### Nagios Plugin Dir:
 
-The full path to link this plugin to
+The full path to nagios's plugin dir
 
 Default Value: 
 
-- `/usr/lib/nagios/plugins/check_mysql_health_chef`
+- `/usr/lib/nagios/plugins`
 
 Ruby usage:
 
 ```ruby
-node['icinga2_plugin_mysql']['nagios']['nagios_plugin_link'] = '/usr/lib/nagios/plugins/check_mysql_health_chef'
+node['icinga2_plugin_mysql']['nagios']['nagios_plugin_dir'] = '/usr/lib/nagios/plugins'
 ```
 
 JSON usage:
@@ -117,7 +117,7 @@ JSON usage:
 {
   "icinga2_plugin_mysql": {
     "nagios": {
-      "nagios_plugin_link": "/usr/lib/nagios/plugins/check_mysql_health_chef"
+      "nagios_plugin_dir": "/usr/lib/nagios/plugins"
     }
   }
 }
