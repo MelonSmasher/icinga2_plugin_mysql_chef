@@ -61,7 +61,7 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   # runs the configure script for automake - only runs when triggered by the execute tar directive
   execute 'configure_automake' do
-    command './configure'
+    command 'PATH=$PATH:/usr/local/src/autoconf-2.61/bin/;./configure'
     cwd '/usr/local/src/automake-1.10'
     notifies :run, 'execute[make_automake]', :immediately
     action :nothing
@@ -69,7 +69,7 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   # makes the automake bin - only runs when triggered by the execute configure directive
   execute 'make_automake' do
-    command 'make'
+    command 'PATH=$PATH:/usr/local/src/autoconf-2.61/bin/;make'
     cwd '/usr/local/src/automake-1.10'
     action :nothing
   end
