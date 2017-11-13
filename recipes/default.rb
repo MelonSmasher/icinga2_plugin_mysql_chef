@@ -38,6 +38,14 @@ if %w{rhel debian}.include?(node['platform_family'])
   execute 'make_autoconf' do
     command 'make'
     cwd '/usr/local/src/autoconf-2.61'
+    notifies :run, 'execute[make_install_autoconf]', :immediately
+    action :nothing
+  end
+
+  # makes installs autoconf - only runs when triggered by the execute make directive
+  execute 'make_install_autoconf' do
+    command 'make install'
+    cwd '/usr/local/src/autoconf-2.61'
     action :nothing
   end
 
@@ -61,7 +69,7 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   # runs the configure script for automake - only runs when triggered by the execute tar directive
   execute 'configure_automake' do
-    command 'PATH=$PATH:/usr/local/src/autoconf-2.61/bin/;./configure'
+    command './configure'
     cwd '/usr/local/src/automake-1.10'
     notifies :run, 'execute[make_automake]', :immediately
     action :nothing
@@ -69,7 +77,15 @@ if %w{rhel debian}.include?(node['platform_family'])
 
   # makes the automake bin - only runs when triggered by the execute configure directive
   execute 'make_automake' do
-    command 'PATH=$PATH:/usr/local/src/autoconf-2.61/bin/;make'
+    command 'make'
+    cwd '/usr/local/src/automake-1.10'
+    notifies :run, 'execute[make_install_automake]', :immediately
+    action :nothing
+  end
+
+  # installs the automake - only runs when triggered by the execute make directive
+  execute 'make_install_automake' do
+    command 'make install'
     cwd '/usr/local/src/automake-1.10'
     action :nothing
   end
@@ -94,8 +110,8 @@ if %w{rhel debian}.include?(node['platform_family'])
   nagios_plugin_target = File.join(node['icinga2_plugin_mysql']['nagios']['nagios_plugin_dir'], 'check_mysql_health')
   nagios_plugin_source = File.join(git_repo_path, 'plugins-scripts', 'check_mysql_health')
 
-  autoconf_bin = '/usr/local/src/autoconf-2.61/bin/autoconf'
-  automake_bin = '/usr/local/src/automake-1.10/automake'
+  autoconf_bin = 'autoconf'
+  automake_bin = 'automake'
 
   ### Commands - not run until notified ###
   # run autoconf
